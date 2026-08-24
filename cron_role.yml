@@ -1,0 +1,7 @@
+---
+- name: Configure uptime cron
+  hosts: all
+  become: true
+
+  roles:
+    - cron_role
