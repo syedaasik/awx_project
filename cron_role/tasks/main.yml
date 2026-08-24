@@ -1,0 +1,7 @@
+---
+- name: Configure uptime cron job
+  ansible.builtin.cron:
+    name: "{{ cron_job_name }}"
+    user: "{{ cron_user }}"
+    minute: "*/5"
+    job: "{{ cron_command }}"
