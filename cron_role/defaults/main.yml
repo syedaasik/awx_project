@@ -1,0 +1,5 @@
+---
+cron_command: "uptime"
+cron_schedule: "*/5 * * * *"
+cron_user: "syed"
+cron_job_name: "uptime every 5 minutes"
