@@ -1,0 +1,8 @@
+---
+- name: Patch Fedora servers
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - fedora_patch
