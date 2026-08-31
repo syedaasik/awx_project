@@ -1,0 +1,13 @@
+---
+# Package patching
+fedora_patch_update_cache: true
+fedora_patch_upgrade: true
+
+# Reboot configuration
+fedora_patch_reboot: true
+fedora_patch_reboot_timeout: 600
+
+# How long Ansible waits for SSH to become available
+fedora_patch_connect_timeout: 10
+fedora_patch_connect_retries: 60
+fedora_patch_connect_delay: 10
