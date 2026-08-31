@@ -5,8 +5,8 @@
       - ansible_facts.distribution in ["Fedora", "RedHat", "Debian", "Ubuntu"]
     fail_msg: "This role is intended for Fedora, Red Hat, Debian, or Ubuntu servers."
 
-- name: Update DNF cache
-  ansible.builtin.dnf:
+- name: Update package cache
+  ansible.builtin.package:
     update_cache: true
   when: fedora_patch_update_cache
 
