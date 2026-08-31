@@ -1,0 +1,25 @@
+---
+- name: Check operating system
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == "Fedora"
+    fail_msg: "This role is intended for Fedora servers."
+
+- name: Update DNF cache
+  ansible.builtin.dnf:
+    update_cache: true
+  when: fedora_patch_update_cache
+
+- name: Upgrade all Fedora packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+  register: fedora_patch_result
+  notify: Reboot Fedora server
+  when: fedora_patch_upgrade
+
+- name: Display patch result
+  ansible.builtin.debug:
+    msg:
+      - "Packages changed: {{ fedora_patch_result.changed }}"
+      - "Reboot required: {{ fedora_patch_result.changed and fedora_patch_reboot }}"
