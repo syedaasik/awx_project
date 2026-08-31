@@ -1,0 +1,10 @@
+---
+- name: Reboot Fedora server
+  ansible.builtin.reboot:
+    msg: "Ansible initiated reboot after Fedora patching"
+    reboot_timeout: "{{ fedora_patch_reboot_timeout }}"
+    connect_timeout: "{{ fedora_patch_connect_timeout }}"
+    pre_reboot_delay: 5
+    post_reboot_delay: 10
+    test_command: "whoami"
+  when: fedora_patch_reboot
