@@ -2,8 +2,8 @@
 - name: Check operating system
   ansible.builtin.assert:
     that:
-      - ansible_facts.distribution == "Fedora"
-    fail_msg: "This role is intended for Fedora servers."
+      - ansible_facts.distribution in ["Fedora", "RedHat", "Debian", "Ubuntu"]
+    fail_msg: "This role is intended for Fedora, Red Hat, Debian, or Ubuntu servers."
 
 - name: Update DNF cache
   ansible.builtin.dnf:
