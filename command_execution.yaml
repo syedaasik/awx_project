@@ -2,6 +2,7 @@
 - name: Run shell commands
   hosts: all
   gather_facts: false
+  become: true
   tasks:
     - name: Execute shell command
       ansible.builtin.shell: "{{ cmd }}"
