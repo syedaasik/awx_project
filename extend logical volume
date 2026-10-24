@@ -1,0 +1,65 @@
+---
+- name: Extend /data when usage is above 90 percent
+  hosts: all
+  become: true
+  vars:
+    mount_point: /data
+    threshold: 90
+
+  tasks:
+    - name: Get usage percentage of {{ mount_point }}
+      ansible.builtin.shell: df -P {{ mount_point }} | awk 'NR==2{print $5}' | tr -d '%'
+      register: usage
+      changed_when: false
+
+    - name: Show current usage
+      ansible.builtin.debug:
+        msg: "{{ mount_point }} is {{ usage.stdout }}% full (threshold {{ threshold }}%)"
+
+    - name: Extend the volume when usage is above the threshold
+      when: usage.stdout | int > threshold
+      block:
+        - name: Get the device backing {{ mount_point }}
+          ansible.builtin.command: findmnt -n -o SOURCE {{ mount_point }}
+          register: mount_src
+          changed_when: false
+
+        - name: Find the volume group and logical volume for that device
+          ansible.builtin.shell: >
+            lvs --noheadings -o vg_name,lv_name,lv_dm_path
+            | awk -v dev="{{ mount_src.stdout | trim }}" '$3==dev || $3 ~ dev {print $1, $2, $3}'
+          register: lv_info
+          changed_when: false
+
+        - name: Fail if {{ mount_point }} is not an LVM logical volume
+          ansible.builtin.fail:
+            msg: "{{ mount_point }} is not on LVM on {{ inventory_hostname }}. Nothing changed."
+          when: lv_info.stdout | trim == ''
+
+        - name: Set volume group and logical volume path
+          ansible.builtin.set_fact:
+            vg_name: "{{ lv_info.stdout.split()[0] }}"
+            lv_path: "{{ lv_info.stdout.split()[2] }}"
+
+        - name: Get free extents in volume group {{ vg_name }}
+          ansible.builtin.command: vgs --noheadings -o vg_free_count {{ vg_name }}
+          register: free_pe
+          changed_when: false
+
+        - name: Fail if the volume group has no free extents
+          ansible.builtin.fail:
+            msg: "Volume group {{ vg_name }} has no free extents on {{ inventory_hostname }}. {{ mount_point }} is {{ usage.stdout }}% full. Nothing changed."
+          when: free_pe.stdout | trim | int == 0
+
+        - name: Extend {{ lv_path }} with all free extents and grow the filesystem
+          ansible.builtin.command: lvextend -r -l +100%FREE {{ lv_path }}
+          changed_when: true
+
+        - name: Show new usage
+          ansible.builtin.command: df -h {{ mount_point }}
+          register: new_usage
+          changed_when: false
+
+        - name: Display result
+          ansible.builtin.debug:
+            var: new_usage.stdout_lines
