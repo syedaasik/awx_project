@@ -1,5 +1,5 @@
 ---
-- name: Disable root SSH login
+- name: OS hardening
   hosts: all
   become: true
   tasks:
