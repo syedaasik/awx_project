@@ -1,0 +1,7 @@
+---
+- name: OS hardening
+  hosts: all
+  become: true
+
+  roles:
+    - hardening
