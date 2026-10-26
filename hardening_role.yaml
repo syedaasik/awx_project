@@ -4,4 +4,4 @@
   become: true
 
   roles:
-    - hardening
+    - new-os-hardening-role
