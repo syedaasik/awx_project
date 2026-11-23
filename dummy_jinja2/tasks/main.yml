@@ -1,0 +1,6 @@
+---
+# tasks file for dummy_jinja2
+- name: Create a file with content from a Jinja2 template
+  ansible.builtin.template:
+    src: dummy_template.j2
+    dest: /tmp/dummy_output.txt
