@@ -1,5 +1,5 @@
 ---
-- name: Configure uptime cron
+- name: dummy role
   hosts: all
   become: true
   gather_facts: true
