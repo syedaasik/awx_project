@@ -1,0 +1,8 @@
+---
+- name: Configure uptime cron
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - dummy_jinja2
